@@ -10,7 +10,7 @@ version: 1.2
 purpose: "Universal framework for evaluating any system that produces output through a process. Two tools, three readings."
 ---
 
-# COFE -- Comprehension-First Evaluation Framework
+# COFE: Comprehension-First Evaluation Framework
 
 **C**omprehension . **O**peration . **F**idelity . **E**fficiency *(pronounced "coffee")*
 
@@ -93,15 +93,15 @@ Evaluators may score 2 or 4 using judgment between anchors. The 1/3/5 anchors ar
 
 ### 2.1 Comprehension
 
-*Does the plan understand the full picture before execution begins?*
+*How well does the system demonstrate understanding of the task before execution begins?*
 
-| Sub-criterion               | 1 (Active failure)                                                                        | 3 (Adequate)                                     | 5 (Strong)                                                                 |
-| --------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------- |
-| **Task grasp**              | Misinterpreted intent                                                                     | Restated accurately, no interpretation           | Interpreted correctly, brought context, understood unstated intent         |
-| **Ambiguity handling**      | Did not notice ambiguity that affected output                                             | Noticed ambiguity, made reasonable assumptions   | Identified ambiguity, resolved with reasoning or flagged for decision      |
-| **Prior knowledge mapping** | Claimed knowledge that does not exist, missed critical prior art, or did not check at all | Checked existing work, missed significant pieces | Mapped the landscape -- what exists, what has been tried, what is adjacent |
+| Sub-criterion               | 1 (Active failure)                                                                        | 3 (Adequate)                                                         | 5 (Strong)                                                                 |
+| --------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Task grasp**              | Misinterpreted intent                                                                     | Restated accurately, no interpretation                               | Interpreted correctly, brought context, understood unstated intent         |
+| **Ambiguity handling**      | Did not notice ambiguity that affected output                                             | Noticed ambiguity, made reasonable assumptions                       | Identified ambiguity, resolved with reasoning or flagged for decision      |
+| **Prior knowledge mapping** | Claimed knowledge that does not exist, missed critical prior art, or did not check at all | Checked existing work, missed significant pieces                     | Mapped the landscape -- what exists, what has been tried, what is adjacent |
 | **Scope definition**        | Defined scope that contradicts the task, or no explicit scope at all                      | Partial scope -- some boundaries defined, ambiguous areas unresolved | Clear IN/OUT/AMBIGUOUS, all justified                                      |
-| **Gap awareness**           | Claimed completeness despite obvious unknowns, or no acknowledgment of unknowns at all    | Listed gaps but did not let them shape the approach | Specific, honest gaps that shaped the approach                             |
+| **Gap awareness**           | Claimed completeness despite obvious unknowns, or no acknowledgment of unknowns at all    | Listed gaps but did not let them shape the approach                  | Specific, honest gaps that shaped the approach                             |
 
 ### 2.2 Operation
 

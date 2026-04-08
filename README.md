@@ -1,4 +1,4 @@
-# COFE — Comprehension, Operation, Fidelity, Efficiency
+# COFE: Comprehension-First Evaluation Framework
 
 *Pronounced "coffee."*
 
