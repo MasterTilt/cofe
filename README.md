@@ -1,5 +1,7 @@
 # COFE — Comprehension, Operation, Fidelity, Efficiency
 
+*Pronounced "coffee."*
+
 A framework for evaluating any system that produces output through a process.
 
 ## What is COFE?

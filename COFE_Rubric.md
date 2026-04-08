@@ -12,7 +12,7 @@ purpose: "Universal framework for evaluating any system that produces output thr
 
 # COFE -- Multi-Agent Evaluation Framework
 
-**C**omprehension . **O**peration . **F**idelity . **E**fficiency
+**C**omprehension . **O**peration . **F**idelity . **E**fficiency *(pronounced "coffee")*
 
 *Universal framework for evaluating any system that produces output through a process. Two evaluation tools: output evaluation (per-operation) and system evaluation (periodic). Three readings: output, system, reliability.*
 
