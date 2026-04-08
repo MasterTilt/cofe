@@ -2,7 +2,7 @@
 
 *Pronounced "coffee."*
 
-An extensible framework for evaluating any system that produces output through a process.
+An extensible framework for evaluating any system that produces output.
 
 ## What is COFE?
 
