@@ -28,15 +28,15 @@ COFE addresses all three gaps.
 **Output evaluation** (per-operation): Three phases scored via geometric mean.
 
 - **Comprehension** (weighted 0.40) -- How well does the system understand the task?
-- **Operation** (weighted 0.30) -- Did execution match the plan?
-- **Fidelity** (weighted 0.30) -- Is the artifact correct and usable?
+- **Operation** (weighted 0.30) -- How well was the plan executed?
+- **Fidelity** (weighted 0.30) -- How correct and usable is the output?
 
 **System evaluation** (periodic): 22 mechanisms across four phases, scored on effectiveness.
 
-- Comprehension mechanisms (5) -- Can the system understand tasks?
-- Operation mechanisms (6) -- Can the system execute and coordinate?
-- Fidelity mechanisms (4) -- Can the system verify correctness?
-- Efficiency mechanisms (7) -- Is cost proportional to value?
+- Comprehension mechanisms (5) -- Can the system reliably understand tasks?
+- Operation mechanisms (6) -- Can the system reliably execute and coordinate?
+- Fidelity mechanisms (4) -- Can the system reliably verify correctness?
+- Efficiency mechanisms (7) -- Can the system reliably manage its resources?
 
 **Reliability Score**: The geometric mean of output and system composites. Trust is bounded by the weaker dimension.
 
