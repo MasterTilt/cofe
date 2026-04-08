@@ -6,7 +6,8 @@ A framework for evaluating any system that produces output through a process.
 
 COFE evaluates two things most frameworks conflate: **what a system produced** (output evaluation) and **whether the system can produce it reliably** (system evaluation). It produces three readings: an output score, a system score, and a reliability score that bounds trust by the weaker dimension.
 
-Most evaluation frameworks measure output quality. COFE asks first: **did the system understand the task before executing?**
+Most evaluation frameworks measure output quality. 
+COFE asks first: **did the system understand the task before executing?**
 
 ## Why does COFE exist?
 
