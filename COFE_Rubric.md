@@ -7,14 +7,14 @@ status: active
 created: 2026-04-05
 updated: 2026-04-07
 version: 1.3
-purpose: "Universal framework for evaluating any system that produces output through a process. Two tools, three readings."
+purpose: "Universal framework for evaluating any LLM process, prompt, or system. Two tools, three readings."
 ---
 
 # COFE: Comprehension-First Evaluation Framework
 
 **C**omprehension . **O**peration . **F**idelity . **E**fficiency *(pronounced "coffee")*
 
-*Universal framework for evaluating any system that produces output through a process. Two evaluation tools: output evaluation (per-operation) and system evaluation (periodic). Three readings: output, system, reliability.*
+*Universal framework for evaluating any LLM process, prompt, or system. Two evaluation tools: output evaluation (per-operation) and system evaluation (periodic). Three readings: output, system, reliability.*
 
 *v1.3.1 -- Reliability Score changed from symmetric sqrt(O×S) to asymmetric O^0.40 × S^0.60. System weighted higher because reliability predicts future performance, which depends more on the factory than the last product. Motivated by COFE-on-CLEAR meta-evaluation (S370) where strong paper (4.23) + weak system fidelity (2.29) produced Reliability 3.53 Strong under symmetric weighting — too generous for a framework with no verification of its own ground truth. v1.3 -- Prior knowledge mapping and scope definition anchors sharpened: "existing work" now explicitly means external to the system. Internal self-references do not count as prior art check. Scope definition requires stating what was excluded and why. System mechanism #4 description updated to match. Motivated by external-external validation (DeepSeek on bleeding-edge, S370) where evaluator scored prior knowledge 4 by accepting internal references as landscape. v1.2.1 -- DeepSeek critique pass: geometric mean within phases, output verification effectiveness-not-methods, execution monitoring trivial-workflow clause, Efficiency Score defined, N/A rule for output sub-criteria, prior knowledge mapping anchor corrected. v1.2 -- Anchor recalibration (1=active failure, 3=adequate, 5=strong). New system mechanisms: system legibility, execution monitoring, output verification, resource fitness, completion rate. Component utilization removed (extended module). Process deduplication folded into waste prevention. Scoring confirmed: equal sub-criteria weights, phase-level geometric mean. See changelog.*
 
@@ -435,4 +435,4 @@ Same 1-5 scale across output, system, and reliability readings. Scores are direc
 
 ---
 
-*COFE Evaluation Framework. v1.0 (S363) -> v1.1 (S366) -> v1.2 (S367). Designed within a 360+ session human-AI collaborative system. Validated on internal operations and one external evaluation (anonymized external system, S365-366). The framework's rigor comes from building it while living inside the system it evaluates.*
+*COFE Evaluation Framework. v1.0 (S363) -> v1.1 (S366) -> v1.2 (S367) -> v1.3 (S370) -> v1.3.1 (S370). Designed within a 370+ session human-AI collaborative system. Validated on internal operations, external evaluation (anonymized external system, S365-366), and 7-evaluator inter-rater study (S369-370). The framework's rigor comes from building it while living inside the system it evaluates.*
