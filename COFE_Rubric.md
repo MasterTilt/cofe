@@ -6,7 +6,7 @@ type: spec
 status: active
 created: 2026-04-05
 updated: 2026-04-07
-version: 1.2
+version: 1.3
 purpose: "Universal framework for evaluating any system that produces output through a process. Two tools, three readings."
 ---
 
@@ -16,7 +16,7 @@ purpose: "Universal framework for evaluating any system that produces output thr
 
 *Universal framework for evaluating any system that produces output through a process. Two evaluation tools: output evaluation (per-operation) and system evaluation (periodic). Three readings: output, system, reliability.*
 
-*v1.2.1 -- DeepSeek critique pass: geometric mean within phases, output verification effectiveness-not-methods, execution monitoring trivial-workflow clause, Efficiency Score defined, N/A rule for output sub-criteria, prior knowledge mapping anchor corrected. v1.2 -- Anchor recalibration (1=active failure, 3=adequate, 5=strong). New system mechanisms: system legibility, execution monitoring, output verification, resource fitness, completion rate. Component utilization removed (extended module). Process deduplication folded into waste prevention. Scoring confirmed: equal sub-criteria weights, phase-level geometric mean. See changelog.*
+*v1.3.1 -- Reliability Score changed from symmetric sqrt(O×S) to asymmetric O^0.40 × S^0.60. System weighted higher because reliability predicts future performance, which depends more on the factory than the last product. Motivated by COFE-on-CLEAR meta-evaluation (S370) where strong paper (4.23) + weak system fidelity (2.29) produced Reliability 3.53 Strong under symmetric weighting — too generous for a framework with no verification of its own ground truth. v1.3 -- Prior knowledge mapping and scope definition anchors sharpened: "existing work" now explicitly means external to the system. Internal self-references do not count as prior art check. Scope definition requires stating what was excluded and why. System mechanism #4 description updated to match. Motivated by external-external validation (DeepSeek on bleeding-edge, S370) where evaluator scored prior knowledge 4 by accepting internal references as landscape. v1.2.1 -- DeepSeek critique pass: geometric mean within phases, output verification effectiveness-not-methods, execution monitoring trivial-workflow clause, Efficiency Score defined, N/A rule for output sub-criteria, prior knowledge mapping anchor corrected. v1.2 -- Anchor recalibration (1=active failure, 3=adequate, 5=strong). New system mechanisms: system legibility, execution monitoring, output verification, resource fitness, completion rate. Component utilization removed (extended module). Process deduplication folded into waste prevention. Scoring confirmed: equal sub-criteria weights, phase-level geometric mean. See changelog.*
 
 ---
 
@@ -99,8 +99,8 @@ Evaluators may score 2 or 4 using judgment between anchors. The 1/3/5 anchors ar
 | --------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | **Task grasp**              | Misinterpreted intent                                                                     | Restated accurately, no interpretation                               | Interpreted correctly, brought context, understood unstated intent         |
 | **Ambiguity handling**      | Did not notice ambiguity that affected output                                             | Noticed ambiguity, made reasonable assumptions                       | Identified ambiguity, resolved with reasoning or flagged for decision      |
-| **Prior knowledge mapping** | Claimed knowledge that does not exist, missed critical prior art, or did not check at all | Checked existing work, missed significant pieces                     | Mapped the landscape -- what exists, what has been tried, what is adjacent |
-| **Scope definition**        | Defined scope that contradicts the task, or no explicit scope at all                      | Partial scope -- some boundaries defined, ambiguous areas unresolved | Clear IN/OUT/AMBIGUOUS, all justified                                      |
+| **Prior knowledge mapping** | No external prior art check -- treats own internal references as the landscape, or claims novelty on established patterns | Checked external solutions or prior art in the relevant domain, missed significant existing work | Surveyed the external landscape -- what exists, what has been tried, why existing solutions are insufficient. Built only the novel delta |
+| **Scope definition**        | Defined scope that contradicts the task, no explicit scope, or no statement of what the system does not know or chose not to use | Partial scope -- boundaries defined for what's IN, but does not state what was excluded or why | Clear IN/OUT/AMBIGUOUS, all justified. Explicitly states what exists externally that was excluded and why |
 | **Gap awareness**           | Claimed completeness despite obvious unknowns, or no acknowledgment of unknowns at all    | Listed gaps but did not let them shape the approach                  | Specific, honest gaps that shaped the approach                             |
 
 ### 2.2 Operation
@@ -186,7 +186,7 @@ Ordered by dependency: legibility enables comprehension checks, which enable sco
 | 1 | **System legibility** | An evaluator can determine intended behavior without reverse-engineering -- via documentation, naming, structure, or any combination. | M |
 | 2 | **Pre-work comprehension check** | Any form -- gate, brief, intake process. Are agents demonstrating genuine understanding or template compliance? | M |
 | 3 | **Scope definition process** | Explicit boundaries before work begins. Are boundaries clear, enforced, and resolved when ambiguous? | M |
-| 4 | **Prior knowledge / evidence base mapping** | Agents declare what they are working from. Do agents consistently find and declare existing work before starting? | M |
+| 4 | **Prior knowledge / evidence base mapping** | Agents declare what exists externally and what they are working from. Do agents check external prior art -- existing solutions, libraries, patterns in the relevant domain -- before starting? | M |
 | 5 | **Gap / unknown identification** | Agents declare what they do not know. Do gaps shape the approach, or are they listed and ignored? | |
 
 System legibility is the precondition for all other Comprehension mechanisms. If the system's own instructions are illegible, comprehension mechanisms have nothing coherent to work with. A system with excellent comprehension gates but incoherent instructions will pass agents through on vibes, not on substance.
@@ -328,10 +328,10 @@ The Reliability Score answers a different question than output or system alone:
 Output score tells you what just happened. System score tells you what the infrastructure can support. Reliability combines both into a single bounded reading.
 
 ```
-Reliability = sqrt(Output_composite x System_composite)
+Reliability = Output_composite^0.40 x System_composite^0.60
 ```
 
-Unweighted geometric mean of the two composites. The math is symmetric in design -- neither dimension is "more important" -- but asymmetric in effect. **Whichever score is lower drags the combined score down more than an arithmetic average would.** The further apart the two scores, the more the lower one pulls. Equal scores reduce to the arithmetic mean.
+Asymmetric weighted geometric mean. System weighted higher because reliability is a forward-looking reading -- it predicts the next output, and future performance depends more on the system (the factory) than on any single output (the last product). A strong output from a weak system is the definition of unreliable. The 0.40/0.60 split follows the same logic as the phase weights: the more consequential dimension gets the higher weight. **The lower score still drags the combined score down more than an arithmetic average would.** The further apart the two scores, the more the lower one pulls.
 
 **Interpretation:**
 
@@ -339,11 +339,11 @@ Unweighted geometric mean of the two composites. The math is symmetric in design
 |---|---|---|---|
 | 5.0 | 5.0 | 5.00 | Excellent + sound -- fully trustworthy |
 | 4.5 | 4.5 | 4.50 | Strong, balanced |
-| 5.0 | 2.0 | 3.16 | Lucky output, fragile system -- will not sustain |
-| 2.0 | 5.0 | 3.16 | Bad day, sound system -- likely to recover |
+| 5.0 | 2.0 | 2.76 | Lucky output, fragile system -- will not sustain |
+| 2.0 | 5.0 | 3.58 | Bad day, sound system -- likely to recover |
 | 1.0 | 1.0 | 1.00 | Non-functional in both readings |
 
-The two asymmetric cases above score the same (3.16) -- that is correct. The single number tells you "asymmetry exists, look at the components to understand which direction." The components answer the question of *whether* trust is recoverable; the combined score flags that the question needs to be asked.
+The two asymmetric cases above score differently (2.76 vs 3.58) -- this is intentional. A fragile system with a lucky output (2.76, Developing) scores lower than a sound system having a bad day (3.58, Strong). The 0.40/0.60 weighting ensures that system quality drives the reliability reading. A strong output cannot rescue a weak system.
 
 **Trust is bounded by the weaker dimension.** The Reliability Score makes that bound explicit without forcing the evaluator to pick which dimension matters more.
 
@@ -374,6 +374,19 @@ Same 1-5 scale across output, system, and reliability readings. Scores are direc
 ---
 
 ## 5.2 Changelog
+
+**v1.3.1 (S370, 2026-04-08)** -- Reliability Score asymmetric weighting.
+
+- **Reliability Score formula changed:** `sqrt(Output × System)` → `Output^0.40 × System^0.60`. System weighted 0.60 because reliability is forward-looking — future performance depends more on the system than on any single output. A strong output from a weak system is the definition of unreliable.
+- **Interpretation table updated:** Asymmetric cases now score differently (2.76 vs 3.58 instead of both 3.16). Fragile system + lucky output scores lower than sound system + bad day.
+- **Motivation:** COFE-on-CLEAR meta-evaluation. CLEAR paper scored 4.23 (Strong) but CLEAR system scored 2.94 (Developing) with Fidelity at 2.29 (Weak). Symmetric Reliability 3.53 (Strong) was too generous for a framework with no verification of its own ground truth. Asymmetric weighting produces 3.37 (Developing) — matches the diagnostic.
+
+**v1.3 (S370, 2026-04-08)** -- Prior knowledge and scope sharpened for external context.
+
+- **Prior knowledge mapping anchors rewritten:** Score 1 now explicitly captures "treats own internal references as the landscape" and "claims novelty on established patterns." Score 3 requires checking external solutions. Score 5 requires surveying external landscape and building only the novel delta.
+- **Scope definition anchors rewritten:** Score 1 now includes "no statement of what the system does not know or chose not to use." Score 3 notes missing exclusion rationale. Score 5 requires explicit statement of what exists externally that was excluded and why.
+- **System mechanism #4 description updated:** "Agents declare what exists externally and what they are working from" -- makes external prior art check the expectation, not internal self-reference.
+- **Motivation:** External-external validation (DeepSeek evaluating bleeding-edge kernel, S370) scored prior knowledge mapping 4 by accepting the system's own block references as "checking existing work." Human evaluator had to supply external domain knowledge at each correction stage to move the score to 1. The anchors allowed the misread; now they don't.
 
 **v1.2 (S367, 2026-04-07)** -- Full review and recalibration. Stratego/XT comparative analysis, internal scoring validation, design philosophy articulation.
 
