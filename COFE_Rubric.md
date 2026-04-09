@@ -1,10 +1,10 @@
 # COFE: Comprehension-First Evaluation Framework
 
-**C**omprehension . **O**peration . **F**idelity . **E**fficiency *(pronounced "coffee")*
+**C**omprehension . **O**peration . **F**idelity . **E**fficiency
 
-*Universal framework for evaluating any LLM process, prompt, or system. Two evaluation tools: output evaluation (per-operation) and system evaluation (periodic). Three readings: output, system, reliability.*
+*Extensible universal framework for evaluating LLM outputs, processes, or systems.*
 
-*v1.3.1 -- Reliability Score changed from symmetric sqrt(O×S) to asymmetric O^0.40 × S^0.60. System weighted higher because reliability predicts future performance, which depends more on the factory than the last product. Motivated by COFE-on-CLEAR meta-evaluation (S370) where strong paper (4.23) + weak system fidelity (2.29) produced Reliability 3.53 Strong under symmetric weighting — too generous for a framework with no verification of its own ground truth. v1.3 -- Prior knowledge mapping and scope definition anchors sharpened: "existing work" now explicitly means external to the system. Internal self-references do not count as prior art check. Scope definition requires stating what was excluded and why. System mechanism #4 description updated to match. Motivated by external-external validation (DeepSeek on bleeding-edge, S370) where evaluator scored prior knowledge 4 by accepting internal references as landscape. v1.2.1 -- DeepSeek critique pass: geometric mean within phases, output verification effectiveness-not-methods, execution monitoring trivial-workflow clause, Efficiency Score defined, N/A rule for output sub-criteria, prior knowledge mapping anchor corrected. v1.2 -- Anchor recalibration (1=active failure, 3=adequate, 5=strong). New system mechanisms: system legibility, execution monitoring, output verification, resource fitness, completion rate. Component utilization removed (extended module). Process deduplication folded into waste prevention. Scoring confirmed: equal sub-criteria weights, phase-level geometric mean. See changelog.*
+*v1.4 — Evaluation Context requirements, rubric tightening, design scope clarified. Full changelog in §5.2.*
 
 ---
 
@@ -12,7 +12,7 @@
 
 | Topic | Sections | Articles |
 |-------|----------|----------|
-| **1. Foundation** | 1.1 Design Philosophy . 1.2 Framework Overview . 1.3 Cell Stage Discipline | -- |
+| **1. Foundation** | 1.1 Design Philosophy . 1.2 Framework Overview . 1.3 Cell Stage Discipline . 1.4 Evaluation Context | -- |
 | **2. Output Evaluation** | 2.1 Comprehension . 2.2 Operation . 2.3 Fidelity | -- |
 | **3. System Evaluation** | 3.1 Absence Semantics . 3.2 Effectiveness Scale . 3.3 Comprehension Mechanisms . 3.4 Operation Mechanisms . 3.5 Fidelity Mechanisms . 3.6 Efficiency Mechanisms | -- |
 | **4. Scoring** | 4.1 Output Score . 4.2 System Score . 4.3 Reliability Score . 4.4 Score Labels | -- |
@@ -22,13 +22,13 @@
 
 ## 1.1 Design Philosophy
 
-COFE evaluates two things most frameworks conflate: **what a system produced** (output evaluation) and **whether the system can produce it reliably** (system evaluation). Conflating them means a lucky output from a broken system scores the same as a reliable output from a sound system.
+COFE *(pronounced coffee)* evaluates two things most frameworks conflate: **what a system produced** (output evaluation) and **whether the system can produce it reliably** (system evaluation). Conflating them means a lucky output from a broken system scores the same as a reliable output from a sound system.
 
-COFE's Comprehension phase is the primary differentiator from existing evaluation frameworks. Most benchmarks measure output quality -- did the system produce a good result? COFE asks first: **did the system understand the task before executing?** Comprehension is weighted highest in output evaluation (0.40) because building the wrong thing efficiently is worse than building the right thing wastefully. The geometric mean ensures that a low Comprehension score collapses the composite regardless of how high Operation and Fidelity score.
+COFE asks first: **did the system understand the task before executing?** Comprehension is weighted highest in output evaluation (0.40) because building the wrong thing efficiently is worse than building the right thing wastefully. The geometric mean ensures that a low Comprehension score collapses the composite regardless of how high Operation and Fidelity score.
 
-Benchmarks evaluate performance within a frame. They do not evaluate whether the frame is correct. COFE's prior knowledge mapping sub-criterion is the only mechanism in surveyed evaluation frameworks that asks: did the system check what already exists before building? This structural requirement breaks the evaluation loop where the same class of system generates output, generates evaluations, and grades itself.
+Prior knowledge mapping requires the system to check what already exists before building. This prevents crediting work that reinvents existing solutions.
 
-**Design scope:** COFE was built for AI agent systems and validated within that domain. The framework's design is domain-agnostic -- Comprehension, Operation, Fidelity, and Efficiency apply to any system that produces output through a process, including human teams, software pipelines, and hybrid human-AI systems. Generalization beyond AI agent systems is a design property, not a validated claim.
+**Design scope:** COFE was built for AI agent systems and validated within that domain. The four phases (Comprehension, Operation, Fidelity, Efficiency) are domain-agnostic principles — any system that produces output can be evaluated on whether it understood the task, executed the plan, and verified the result. However, the sub-criteria, mechanisms, and anchors in this rubric are written for LLM and AI agent evaluation. Applying COFE to other domains (human teams, software pipelines, hybrid systems) would require adapting these components to the domain's specific failure modes and workflows — not bolting on a module, but reworking the evaluation criteria themselves. Generalization is a design property, not a validated claim.
 
 ---
 
@@ -52,9 +52,33 @@ Each phase grades a different temporal stage of the work:
 - **Operation** grades *execution against the plan* -- during the work
 - **Fidelity** grades *the artifact's correctness against the world* -- after delivery
 
-A given root failure may surface in more than one phase if it affects both execution and the artifact -- that is correct, not double jeopardy. Triple jeopardy (the same failure docked in all three phases) only occurs when cells lose stage discipline. The sub-criterion descriptors below explicitly bind each cell to one stage. **Evaluators should grade the stage, not the root cause.**
+A given root failure may surface in more than one phase if it affects both execution and the artifact -- that is correct, not double jeopardy. Triple jeopardy (the same failure docked in all three phases) only occurs when cells lose stage discipline. The sub-criterion descriptors below explicitly bind each cell to one stage. **Evaluators should grade each phase independently against its own stage — not trace a root cause across phases.**
 
 Example: A 3-part essay where only 2 parts get written. Comprehension scores high (the plan correctly identified 3 parts). Operation scores low (execution did not deliver all 3). Fidelity scores low (the artifact is incomplete). Two phases docked, not three -- because the omission affected both execution and artifact, but never the plan.
+
+---
+
+## 1.4 Evaluation Context
+
+Evaluation accuracy depends on the context available to the evaluator. The rubric defines *what* to score. This section defines *what the evaluator needs* to score it accurately.
+
+**Output evaluation — minimum required:**
+
+| Context                       | Why                                                                                                                                                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Prompt / task description** | Required. Without the prompt, the evaluator cannot assess Comprehension or Operation — only Fidelity of the artifact in isolation. The prompt is the reference frame for "did the system understand the task?" |
+| **The output artifact**       | Required. The thing being evaluated.                                                                                                                                                                           |
+| **The plan** (if visible)     | Recommended. Operation scores execution *against the plan*. Without the plan, the evaluator can only infer whether execution was disciplined from the artifact's structure.                                    |
+
+**System evaluation — minimum required:**
+
+| Context                          | Why                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **System documentation**         | Required. The mechanisms being scored must be visible — via documentation, code, architecture descriptions, or any combination.                                                                                                                                                                                                                                   |
+| **System purpose / description** | Required when the target does not self-document its intent. A prompt self-contains its purpose. A multi-agent pipeline does not. Without knowing what the system is *for*, the evaluator cannot assess whether comprehension mechanisms are adequate for the task domain.                                                                                         |
+| **Operational context**          | Optional but improves accuracy. Failure history, usage data, known gaps, edge cases encountered. The inter-rater study (§5.2 in the changelog) demonstrated a monotonic gradient: evaluators with more operational context produced lower, more accurate scores. Evaluators with only design documents scored higher because they evaluated an idealized version. |
+
+**The general principle:** The more complex the target, the more context the evaluator needs. A prompt + output pair is nearly self-contained. A multi-agent system evaluated from its design brief alone will score higher than reality — not because the evaluator is lenient, but because the design brief is an idealized representation.
 
 ---
 
@@ -363,6 +387,15 @@ Same 1-5 scale across output, system, and reliability readings. Scores are direc
 
 ## 5.2 Changelog
 
+**v1.4 (S371, 2026-04-09)** -- Evaluation Context, rubric tightening, design scope clarification.
+
+- **§1.4 Evaluation Context added:** Defines minimum required context for accurate evaluation. Output evaluation requires prompt + artifact + plan. System evaluation requires documentation + system purpose + operational context (optional but improves accuracy). Formalized the inter-rater finding: evaluators with more context produce lower, more accurate scores.
+- **Design scope rewritten:** Clarifies that the four phases are domain-agnostic principles, but the sub-criteria, mechanisms, and anchors are LLM-specific. Cross-domain application requires adapting the evaluation criteria, not bolting on modules.
+- **§1.1 competitive positioning moved to paper:** "Only mechanism in surveyed frameworks" and "breaks the evaluation loop" removed from rubric — those are paper claims (§3-4), not rubric instructions.
+- **Cell stage discipline clarified:** "Grade the stage, not the root cause" → "Grade each phase independently against its own stage — not trace a root cause across phases."
+- **Subtitle tightened:** Changelog wall collapsed to one line. Pronunciation moved from acronym line to §1.1 first mention. "Two tools, three readings" removed from subtitle (belongs in §1.2).
+- **Frontmatter:** version bumped, purpose field aligned with subtitle.
+
 **v1.3.1 (S370, 2026-04-08)** -- Reliability Score asymmetric weighting.
 
 - **Reliability Score formula changed:** `sqrt(Output × System)` → `Output^0.40 × System^0.60`. System weighted 0.60 because reliability is forward-looking — future performance depends more on the system than on any single output. A strong output from a weak system is the definition of unreliable.
@@ -423,4 +456,4 @@ Same 1-5 scale across output, system, and reliability readings. Scores are direc
 
 ---
 
-*COFE Evaluation Framework. v1.0 (S363) -> v1.1 (S366) -> v1.2 (S367) -> v1.3 (S370) -> v1.3.1 (S370). Designed within a 370+ session human-AI collaborative system. Validated on internal operations, external evaluation (anonymized external system, S365-366), and 7-evaluator inter-rater study (S369-370). The framework's rigor comes from building it while living inside the system it evaluates.*
+*COFE Evaluation Framework. v1.0 (S363) -> v1.1 (S366) -> v1.2 (S367) -> v1.3 (S370) -> v1.3.1 (S370) -> v1.4 (S371). Designed within a 370+ session human-AI collaborative system. Validated on internal operations, external evaluation (anonymized external system, S365-366), and 8-evaluator inter-rater study (S369-371). The framework's rigor comes from building it while living inside the system it evaluates.*
