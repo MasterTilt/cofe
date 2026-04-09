@@ -87,69 +87,61 @@ Evaluation accuracy depends on the context available to the evaluator. The rubri
 Three phases of quality output, evaluated in order. Each gates the next.
 
 ```
-2.1 Comprehension  ->  does the plan understand the task?     ->  gates whether work should start
-2.2 Operation      ->  did execution match the plan?           ->  gates whether output is reviewable
-2.3 Fidelity       ->  is the artifact correct and usable?     ->  gates whether output is actionable
+2.1 Comprehension  ->  does the output demonstrate the task was understood?  ->  gates whether work should start
+2.2 Operation      ->  does the output reflect disciplined execution?        ->  gates whether output is reviewable
+2.3 Fidelity       ->  is the artifact correct and usable?                   ->  determines whether output is trustworthy
 ```
 
 Gating is implicit in the math -- geometric mean already collapses on weak phases without needing an explicit threshold cliff. A 1 in any phase pulls the composite down sharply on its own.
 
-**Anchor calibration (v1.2):** All sub-criteria use a consistent gradient:
-- **1 = Active failure** -- the system got it wrong, produced something harmful, contradictory, or misleading
-- **3 = Adequate but passive** -- the system performed correctly but added no value beyond receiving the input
-- **5 = Strong and intentional** -- the system performed well and actively contributed understanding, precision, or value
+**Anchor calibration:** All sub-criteria use a consistent gradient:
+- **1 = Active failure** -- the output is wrong, harmful, contradictory, or misleading
+- **3 = Adequate but passive** -- the output is correct but adds no value beyond restating the input
+- **5 = Strong and intentional** -- the output is correct and actively contributes understanding, precision, or value
 
 Evaluators may score 2 or 4 using judgment between anchors. The 1/3/5 anchors are calibration points, not the only valid scores.
 
-**N/A for output sub-criteria:** If a sub-criterion does not apply to the task (e.g., Actionability for pure analysis, Coordination for single-agent), mark it N/A. N/A sub-criteria are excluded from the phase geometric mean. This follows the same logic as system mechanism N/A rules. If fewer than 2 sub-criteria apply to a phase, flag the phase as insufficient data rather than reporting a single score as the phase score.
+**N/A for output sub-criteria:** If a sub-criterion does not apply to the task (e.g., Actionability for pure analysis, Multi-agent integration for single-agent), mark it N/A. N/A sub-criteria are excluded from the phase geometric mean. This follows the same logic as system mechanism N/A rules. If fewer than 2 sub-criteria apply to a phase, flag the phase as insufficient data rather than reporting a single score as the phase score.
+
+**Comprehension evidence:** Score Comprehension sub-criteria based on evidence visible in the output, the plan (if provided), or inferable from the artifact's quality. If the output includes no comprehension artifacts (no plan, no scope statement, no prior art check), score Task Grasp from the artifact's demonstrated understanding. Mark other sub-criteria N/A if there is no evidence to evaluate -- absence of evidence in the output is not evidence of failure. Whether the system *should* produce comprehension artifacts is a system evaluation question (§3), not an output evaluation question.
 
 ### 2.1 Comprehension
 
-*How well does the system demonstrate understanding of the task before execution begins?*
+*Does the output demonstrate that the task was understood?*
 
-| Sub-criterion               | 1 (Active failure)                                                                        | 3 (Adequate)                                                         | 5 (Strong)                                                                 |
-| --------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| **Task grasp**              | Misinterpreted intent                                                                     | Restated accurately, no interpretation                               | Interpreted correctly, brought context, understood unstated intent         |
-| **Ambiguity handling**      | Did not notice ambiguity that affected output                                             | Noticed ambiguity, made reasonable assumptions                       | Identified ambiguity, resolved with reasoning or flagged for decision      |
-| **Prior knowledge mapping** | No external prior art check -- treats own internal references as the landscape, or claims novelty on established patterns | Checked external solutions or prior art in the relevant domain, missed significant existing work | Surveyed the external landscape -- what exists, what has been tried, why existing solutions are insufficient. Built only the novel delta |
-| **Scope definition**        | Defined scope that contradicts the task, no explicit scope, or no statement of what the system does not know or chose not to use | Partial scope -- boundaries defined for what's IN, but does not state what was excluded or why | Clear IN/OUT/AMBIGUOUS, all justified. Explicitly states what exists externally that was excluded and why |
-| **Gap awareness**           | Claimed completeness despite obvious unknowns, or no acknowledgment of unknowns at all    | Listed gaps but did not let them shape the approach                  | Specific, honest gaps that shaped the approach                             |
+| Sub-criterion | 1 (Active failure) | 3 (Adequate) | 5 (Strong) |
+|---|---|---|---|
+| **Task grasp** | Misinterpreted intent, or restated input without evidence of understanding (performing comprehension) | Interpreted correctly but did not add context, identify implications, or connect to existing knowledge | Interpreted correctly, brought context, understood unstated intent |
+| **Scope & landscape** | No scope defined, or scope defined without reference to what already exists externally | Scope defined with boundaries, checked external solutions but incomplete | Clear IN/OUT/AMBIGUOUS with justification. External landscape surveyed. Built only the novel delta |
+| **Gap awareness** | Claimed completeness despite obvious unknowns, or no acknowledgment of unknowns | Listed gaps but did not let them shape the approach | Specific, honest gaps that shaped the approach |
+| **Ambiguity handling** | Did not notice ambiguity that affected output | Noticed ambiguity, made reasonable assumptions | Identified ambiguity, resolved with reasoning or flagged for decision |
 
 ### 2.2 Operation
 
-*How well was the plan executed and coordinated?*
+*Does the output reflect disciplined execution against a plan?*
 
 | Sub-criterion | 1 (Active failure) | 3 (Adequate) | 5 (Strong) |
 |---|---|---|---|
 | **Plan execution** | Executed against the plan -- did something contradictory | Plan partially followed, deviations unjustified | Plan followed or deviation justified |
 | **Scope discipline** | Executed outside scope and presented it as in-scope | Minor drift, mostly on track | Tight -- exactly what was committed |
-| **Coordination** (multi-agent) | Agents contradicted or duplicated each other | Some shared context, transfer gaps | Agents built on each other, findings integrate |
-| **Differentiation** (multi-agent) | Agents produced identical output | Some convergence, weak unique contributions | Convergent validation from different paths + impactful unique findings |
-| **Delivery completeness** | Delivered wrong artifacts or claimed completion on missing work | Most sections present, some thin or partial | All committed deliverables present and substantive |
+| **Delivery completeness** | Delivered wrong artifacts or claimed completion on missing work | Most deliverables present, some missing | All committed deliverables produced |
+| **Multi-agent integration** (multi-agent) | Contributors contradicted or duplicated each other | Some coherence, visible integration gaps | Output reads as a unified artifact -- contributions build on each other |
 
-**Failure modes to watch for (MAST):**
+**Failure modes to watch for:**
 - **Plan execution:** step repetition -- same action repeated without progress
 - **Scope discipline:** task derailment -- starts right, drifts mid-task
-- **Delivery completeness:** unaware of termination -- agent keeps going past scope or gets stuck
-
-**Differentiation metrics:**
-
-| Metric | What it measures |
-|--------|-----------------|
-| Convergent paths | Agreements where agents cite different evidence -- more paths = higher confidence |
-| Impactful uniques | Unique findings referenced in synthesis or decisions -- specialization that mattered |
-| Coverage breadth | % of sub-questions addressed by at least one agent -- team covered the whole question |
+- **Delivery completeness:** claimed completion on missing work -- says "done" with pieces absent
 
 ### 2.3 Fidelity
 
-*How correct and usable is the output?*
+*Is the artifact correct and usable?*
 
 | Sub-criterion | 1 (Active failure) | 3 (Adequate) | 5 (Strong) |
 |---|---|---|---|
 | **Factual accuracy** | Stated falsehoods as facts | Mostly accurate, some unchecked claims | All facts checkable and correct |
 | **Reasoning quality** | Conclusions contradict the evidence presented | Most conclusions trace, some leaps | Every conclusion traces to cited evidence |
-| **Confidence calibration** | Certain on wrong claims, uncertain on verified ones | Mixed -- some hedged, some overconfident | Certainty matches evidence strength |
-| **Completeness** | Subset presented as the whole -- no acknowledgment of gaps | Covers most, gaps acknowledged | Complete for the task's purpose |
+| **Confidence calibration** | Asserts without support, or hedges on well-supported claims | Level of assertion mostly matches support, some overclaiming or unnecessary hedging | Every assertion is proportional to its evidence. Strong claims are supported. Uncertain areas are flagged |
+| **Completeness** | Subset presented as the whole, or delivered components are hollow/placeholder | Covers most of what's needed, some components thin | Each delivered component is thorough enough for its purpose |
 | **Actionability** | Output misleads if acted upon | Usable with moderate rework | Directly actionable as-is |
 
 **Failure modes to watch for (MAST):**
@@ -219,6 +211,14 @@ Ordered by execution flow: plan, then execute while enforcing scope and monitori
 | 6   | **Delivery tracking**                   | System knows whether all committed outputs were produced. Is completion verified or assumed?                                                                        | M                  |
 
 Scope enforcement and execution monitoring sit adjacent but ask different questions. Scope enforcement: are you doing the *right work*? Execution monitoring: are you doing the work *the right way*? A system can stay perfectly in scope while violating its own protocols. Execution monitoring is only meaningful if the declared workflow is substantive. A trivial workflow (e.g., "do whatever") renders this mechanism N/A.
+
+**Role specialization metrics (multi-agent):**
+
+| Metric | What it measures |
+|--------|-----------------|
+| Convergent paths | Agreements where agents cite different evidence -- more paths = higher confidence |
+| Impactful uniques | Unique findings referenced in synthesis or decisions -- specialization that mattered |
+| Coverage breadth | % of sub-questions addressed by at least one agent -- team covered the whole question |
 
 ### 3.5 Fidelity -- System Mechanisms
 
@@ -299,7 +299,7 @@ Completion rate and human intervention rate are rolling metrics -- only scored w
 
 ### 4.1 Output Score (per operation)
 
-Each phase scored 1-5 as the geometric mean of its sub-criteria. Geometric mean at every level -- within phases and across phases -- ensures a single critical failure cannot be masked by high scores elsewhere. A system scoring 5/5/5/5/1 in a phase gets 3.6 (Developing), not 4.2 (Strong). Sub-criteria are unweighted. The weak sub-criterion varies by system, so pre-assigning weights would encode assumptions about which failures matter most. The geometric mean surfaces whatever is actually weak without requiring those assumptions.
+Each phase scored 1-5 as the geometric mean of its sub-criteria. Geometric mean at every level -- within phases and across phases -- ensures a single critical failure cannot be masked by high scores elsewhere. In a 4-criterion phase, scoring 5/5/5/1 produces 3.34 (Developing), not 4.0 (Strong). In a 5-criterion phase, scoring 5/5/5/5/1 produces 3.62 (Strong), not 4.2 (Strong). Fewer sub-criteria means each one pulls harder -- Comprehension and Operation (4 each) are more sensitive to a single failure than Fidelity (5). Sub-criteria are unweighted. The weak sub-criterion varies by system, so pre-assigning weights would encode assumptions about which failures matter most. The geometric mean surfaces whatever is actually weak without requiring those assumptions.
 
 Composite (weighted geometric mean):
 
@@ -391,6 +391,12 @@ Same 1-5 scale across output, system, and reliability readings. Scores are direc
 
 - **§1.4 Evaluation Context added:** Defines minimum required context for accurate evaluation. Output evaluation requires prompt + artifact + plan. System evaluation requires documentation + system purpose + operational context (optional but improves accuracy). Formalized the inter-rater finding: evaluators with more context produce lower, more accurate scores.
 - **Design scope rewritten:** Clarifies that the four phases are domain-agnostic principles, but the sub-criteria, mechanisms, and anchors are LLM-specific. Cross-domain application requires adapting the evaluation criteria, not bolting on modules.
+- **Output eval sub-criteria restructured (§2):** Comprehension 5→4 (Scope definition + Prior knowledge mapping merged into Scope & landscape). Operation 5→4 (Coordination + Differentiation merged into Multi-agent integration; detailed differentiation metrics moved to system eval). Fidelity unchanged at 5. Total output sub-criteria: 15→13.
+- **Task grasp anchor recalibrated:** "Restated accurately" moved from 3 (adequate) to 1 (active failure). Restating is performing comprehension — the failure mode COFE was built to detect. New 3: "Interpreted correctly without enrichment."
+- **Confidence calibration anchors rewritten:** Domain-agnostic framing — "assertions proportional to evidence" replaces "certain on wrong claims." Applies to code (error handling), websites (copy claims), research (citations), not just analysis.
+- **Output eval reframed as artifact observation:** Phase questions rewritten from "how well does the system..." to "does the output demonstrate..." Anchor calibration rewritten from "the system got it wrong" to "the output is wrong." Evaluators assess the artifact, not the process.
+- **Comprehension evidence note added:** Absence of comprehension artifacts in the output is N/A, not a 1. Whether the system should produce them is a system eval question.
+- **Fidelity gate language changed:** "gates whether output is actionable" → "determines whether output is trustworthy" (Fidelity is the terminal evaluation, not a gate to a next phase).
 - **§1.1 competitive positioning moved to paper:** "Only mechanism in surveyed frameworks" and "breaks the evaluation loop" removed from rubric — those are paper claims (§3-4), not rubric instructions.
 - **Cell stage discipline clarified:** "Grade the stage, not the root cause" → "Grade each phase independently against its own stage — not trace a root cause across phases."
 - **Subtitle tightened:** Changelog wall collapsed to one line. Pronunciation moved from acronym line to §1.1 first mention. "Two tools, three readings" removed from subtitle (belongs in §1.2).
